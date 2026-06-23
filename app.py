@@ -2,184 +2,250 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# Konfigurasi halaman
+# ======================
+# KONFIGURASI HALAMAN
+# ======================
 st.set_page_config(
-    page_title="Dashboard Statistik Piala Dunia",
+    page_title="Piala Dunia 2026 Analytics",
     page_icon="🏆",
     layout="wide"
 )
 
-# CSS Tampilan
-st.markdown("""
-<style>
-.main {
-    background-color: #0E1117;
-}
-
-[data-testid="metric-container"]{
-    background: linear-gradient(135deg,#1E293B,#334155);
-    border-radius:15px;
-    padding:20px;
-    box-shadow:0px 0px 15px rgba(0,0,0,0.3);
-}
-
-h1,h2,h3{
-    color:white;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# Membaca Data
+# ======================
+# DATA
+# ======================
 df = pd.read_csv("data_pialadunia.csv")
 
-# Sidebar
-st.sidebar.title("🏆 Menu Dashboard")
+# ======================
+# SIDEBAR
+# ======================
+st.sidebar.title("🏆 FIFA WORLD CUP 2026")
 
-negara = st.sidebar.multiselect(
-    "Pilih Negara",
-    options=df["Negara"],
-    default=df["Negara"]
+benua = st.sidebar.multiselect(
+    "Pilih Benua",
+    df["Benua"].unique(),
+    default=df["Benua"].unique()
 )
 
-df = df[df["Negara"].isin(negara)]
+df = df[df["Benua"].isin(benua)]
 
-# Header
-st.title("🏆 Dashboard Statistik Piala Dunia")
+# ======================
+# HEADER
+# ======================
+st.title("🏆 FIFA World Cup 2026 Analytics Dashboard")
 
 st.markdown("""
 ### Analisis Performa Negara Peserta Piala Dunia
 
-Selamat datang di Dashboard Statistik Piala Dunia.
+Dashboard ini dibuat untuk menganalisis performa negara peserta Piala Dunia
+berdasarkan statistik pertandingan, produktivitas gol, kekuatan pertahanan,
+serta peluang menjadi kandidat juara.
 
-Dashboard ini dibuat untuk menyajikan informasi mengenai performa
-negara-negara peserta berdasarkan jumlah pertandingan, kemenangan,
-kekalahan, jumlah gol yang dicetak, serta total poin yang diperoleh.
-
-Melalui dashboard ini pengguna dapat:
-
-✅ Melihat performa masing-masing negara
-
-✅ Membandingkan jumlah poin antar negara
-
-✅ Menganalisis produktivitas gol
-
-✅ Mengetahui negara dengan performa terbaik
-
-✅ Melakukan analisis data secara interaktif melalui visualisasi grafik
-
-Visualisasi data yang ditampilkan bertujuan untuk mempermudah
-pemahaman terhadap kondisi dan performa setiap negara dalam kompetisi.
+Melalui dashboard ini pengguna dapat memahami performa setiap negara
+secara visual dan interaktif.
 """)
 
 st.info(
-    "📌 Gunakan menu filter pada sidebar sebelah kiri untuk memilih negara yang ingin dianalisis."
+    "📌 Gunakan filter benua pada sidebar untuk melakukan analisis yang lebih spesifik."
 )
 
 st.divider()
 
-# KPI Cards
-col1, col2, col3, col4 = st.columns(4)
+# ======================
+# KPI
+# ======================
+col1,col2,col3,col4 = st.columns(4)
 
 with col1:
     st.metric("🌍 Total Negara", len(df))
 
 with col2:
-    st.metric("⚽ Total Goal", int(df["Goal_Masuk"].sum()))
+    st.metric("⚽ Total Gol", int(df["Goal_Masuk"].sum()))
 
 with col3:
     st.metric("🏅 Total Poin", int(df["Poin"].sum()))
 
 with col4:
-    st.metric("📈 Rata-rata Poin", round(df["Poin"].mean(), 2))
+    st.metric("🛡️ Clean Sheet", int(df["Clean_Sheet"].sum()))
 
 st.divider()
 
-# Grafik Ranking
-col1, col2 = st.columns(2)
-
-ranking = df.sort_values(
-    by="Poin",
-    ascending=False
+# ======================
+# POWER SCORE
+# ======================
+df["Power_Score"] = (
+    df["Poin"] * 10
+    + df["Goal_Masuk"] * 2
+    + df["Clean_Sheet"] * 3
 )
 
-with col1:
-    fig1 = px.bar(
-        ranking,
-        x="Negara",
-        y="Poin",
-        color="Poin",
-        title="🏅 Ranking Negara Berdasarkan Poin"
-    )
+# ======================
+# TOP 5 KANDIDAT JUARA
+# ======================
+st.subheader("🏆 Top 5 Kandidat Juara")
 
-    st.plotly_chart(fig1, use_container_width=True)
+top5 = df.sort_values(
+    "Power_Score",
+    ascending=False
+).head(5)
 
-with col2:
-    fig2 = px.pie(
-        df,
-        names="Negara",
-        values="Poin",
-        hole=0.5,
-        title="📊 Distribusi Poin"
-    )
+st.dataframe(
+    top5[
+        [
+            "Negara",
+            "Poin",
+            "Goal_Masuk",
+            "Clean_Sheet",
+            "Power_Score"
+        ]
+    ],
+    use_container_width=True
+)
 
-    st.plotly_chart(fig2, use_container_width=True)
+# ======================
+# GRAFIK POWER RANKING
+# ======================
+fig1 = px.bar(
+    top5,
+    x="Negara",
+    y="Power_Score",
+    color="Power_Score",
+    title="Power Ranking Negara"
+)
 
-# Grafik Goal
-col3, col4 = st.columns(2)
+st.plotly_chart(
+    fig1,
+    use_container_width=True
+)
 
-with col3:
-    fig3 = px.bar(
-        df,
-        x="Goal_Masuk",
-        y="Negara",
-        orientation="h",
-        color="Goal_Masuk",
-        title="⚽ Goal Masuk Setiap Negara"
-    )
+# ======================
+# PRODUKTIVITAS GOL
+# ======================
+st.subheader("⚽ Analisis Produktivitas Gol")
 
-    st.plotly_chart(fig3, use_container_width=True)
+fig2 = px.bar(
+    df.sort_values(
+        "Goal_Masuk",
+        ascending=False
+    ),
+    x="Negara",
+    y="Goal_Masuk",
+    color="Goal_Masuk",
+    title="Negara dengan Goal Terbanyak"
+)
 
-with col4:
-    fig4 = px.scatter(
-        df,
-        x="Goal_Masuk",
-        y="Poin",
-        size="Poin",
-        color="Negara",
-        title="🎯 Hubungan Goal dan Poin"
-    )
+st.plotly_chart(
+    fig2,
+    use_container_width=True
+)
 
-    st.plotly_chart(fig4, use_container_width=True)
+# ======================
+# PERTAHANAN
+# ======================
+st.subheader("🛡️ Analisis Pertahanan")
 
-st.divider()
+fig3 = px.bar(
+    df.sort_values(
+        "Clean_Sheet",
+        ascending=False
+    ),
+    x="Negara",
+    y="Clean_Sheet",
+    color="Clean_Sheet",
+    title="Clean Sheet Setiap Negara"
+)
 
-# Negara Terbaik
-terbaik = df.loc[df["Poin"].idxmax()]
+st.plotly_chart(
+    fig3,
+    use_container_width=True
+)
+
+# ======================
+# PERFORMA BENUA
+# ======================
+st.subheader("🌎 Performa Berdasarkan Benua")
+
+benua_data = (
+    df.groupby("Benua")["Poin"]
+    .sum()
+    .reset_index()
+)
+
+fig4 = px.pie(
+    benua_data,
+    names="Benua",
+    values="Poin",
+    hole=0.5,
+    title="Distribusi Poin per Benua"
+)
+
+st.plotly_chart(
+    fig4,
+    use_container_width=True
+)
+
+# ======================
+# SCATTER
+# ======================
+st.subheader("📈 Hubungan Goal dan Poin")
+
+fig5 = px.scatter(
+    df,
+    x="Goal_Masuk",
+    y="Poin",
+    size="Power_Score",
+    color="Benua",
+    hover_name="Negara"
+)
+
+st.plotly_chart(
+    fig5,
+    use_container_width=True
+)
+
+# ======================
+# PREDIKSI JUARA
+# ======================
+juara = top5.iloc[0]
 
 st.success(
-    f"🏆 Negara terbaik saat ini adalah {terbaik['Negara']} dengan total {terbaik['Poin']} poin."
+    f"🏆 Berdasarkan statistik yang dianalisis, "
+    f"{juara['Negara']} merupakan kandidat juara terkuat "
+    f"dengan Power Score sebesar {juara['Power_Score']}."
 )
 
-# Tabel Ranking
-st.subheader("📋 Tabel Ranking Lengkap")
+# ======================
+# TABEL LENGKAP
+# ======================
+st.subheader("📋 Tabel Statistik Lengkap")
+
+ranking = df.sort_values(
+    "Power_Score",
+    ascending=False
+)
 
 st.dataframe(
     ranking,
     use_container_width=True
 )
 
-# Kesimpulan
+# ======================
+# KESIMPULAN
+# ======================
 st.markdown("---")
 
 st.markdown("""
 ## Kesimpulan
 
-Berdasarkan hasil analisis data, terlihat bahwa negara dengan jumlah poin yang tinggi
-cenderung memiliki produktivitas gol yang lebih baik dibandingkan negara lainnya.
+Berdasarkan hasil analisis statistik, performa setiap negara dapat
+dievaluasi menggunakan kombinasi poin, jumlah gol, dan clean sheet.
 
-Dashboard ini membantu pengguna memahami performa setiap negara melalui
-visualisasi data yang interaktif, sehingga proses analisis menjadi lebih mudah
-dan informatif.
+Negara dengan nilai Power Score tertinggi menunjukkan konsistensi
+yang baik dalam menyerang maupun bertahan sehingga memiliki peluang
+lebih besar untuk menjadi kandidat juara.
+
+Dashboard ini dibuat untuk membantu proses analisis data olahraga
+menggunakan Python, Pandas, Plotly, dan Streamlit.
 
 ### Teknologi yang Digunakan
 
@@ -187,6 +253,4 @@ dan informatif.
 - Pandas
 - Plotly
 - Streamlit
-
-Terima kasih telah menggunakan Dashboard Statistik Piala Dunia.
 """)
