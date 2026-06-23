@@ -1,17 +1,50 @@
-Negara,Pertandingan,Menang,Seri,Kalah,Goal_Masuk,Goal_Kemasukan,Poin
-Argentina,3,2,1,0,7,2,7
-Brazil,3,2,0,1,8,3,6
-France,3,3,0,0,9,2,9
-Germany,3,1,1,1,5,4,4
-England,3,2,1,0,6,2,7
-Spain,3,2,0,1,7,3,6
-Portugal,3,2,0,1,5,2,6
-Netherlands,3,1,2,0,4,2,5
-Belgium,3,1,1,1,4,4,4
-Croatia,3,1,1,1,3,3,4
-Uruguay,3,1,0,2,2,4,3
-Mexico,3,0,2,1,2,3,2
-Japan,3,2,0,1,5,4,6
-South Korea,3,1,1,1,3,4,4
-Morocco,3,2,1,0,4,1,7
-Switzerland,3,1,1,1,3,3,4
+Negara,Benua,Pertandingan,Menang,Seri,Kalah,Goal_Masuk,Goal_Kemasukan,Clean_Sheet,Ranking_FIFA,Poin
+Argentina,Amerika Selatan,3,2,1,0,7,2,2,1,7
+Brazil,Amerika Selatan,3,2,0,1,8,3,1,5,6
+France,Eropa,3,3,0,0,9,2,2,2,9
+England,Eropa,3,2,1,0,6,2,2,4,7
+Spain,Eropa,3,2,0,1,7,3,1,3,6
+Portugal,Eropa,3,2,0,1,5,2,1,7,6
+Germany,Eropa,3,1,1,1,5,4,1,10,4
+Netherlands,Eropa,3,1,2,0,4,2,1,6,5
+Belgium,Eropa,3,1,1,1,4,4,0,8,4
+Croatia,Eropa,3,1,1,1,3,3,1,12,4
+Japan,Asia,3,2,0,1,5,4,1,15,6
+South Korea,Asia,3,1,1,1,3,4,1,23,4
+Iran,Asia,3,1,1,1,4,3,1,18,4
+Saudi Arabia,Asia,3,1,1,1,3,4,0,58,4
+Australia,Asia,3,1,0,2,2,4,0,24,3
+Morocco,Afrika,3,2,1,0,4,1,2,12,7
+Senegal,Afrika,3,1,1,1,3,3,1,20,4
+Egypt,Afrika,3,1,1,1,4,4,0,33,4
+Tunisia,Afrika,3,0,1,2,1,5,0,41,1
+Nigeria,Afrika,3,2,0,1,5,3,1,30,6
+United States,CONCACAF,3,2,0,1,6,3,1,16,6
+Mexico,CONCACAF,3,1,1,1,3,3,1,17,4
+Canada,CONCACAF,3,1,1,1,4,4,0,31,4
+Costa Rica,CONCACAF,3,1,0,2,2,5,0,54,3
+Panama,CONCACAF,3,1,0,2,3,6,0,45,3
+Uruguay,Amerika Selatan,3,1,0,2,2,4,0,11,3
+Colombia,Amerika Selatan,3,2,0,1,5,3,1,9,6
+Ecuador,Amerika Selatan,3,1,1,1,3,3,1,27,4
+Paraguay,Amerika Selatan,3,1,1,1,3,4,0,44,4
+Chile,Amerika Selatan,3,1,0,2,2,5,0,42,3
+Serbia,Eropa,3,1,1,1,4,4,0,29,4
+Switzerland,Eropa,3,1,1,1,3,3,1,19,4
+Denmark,Eropa,3,1,1,1,4,4,0,21,4
+Austria,Eropa,3,1,1,1,3,3,1,25,4
+Norway,Eropa,3,2,0,1,5,3,1,26,6
+Poland,Eropa,3,1,0,2,3,5,0,28,3
+Czechia,Eropa,3,1,1,1,3,3,1,36,4
+Scotland,Eropa,3,1,0,2,2,4,0,39,3
+Turkey,Eropa,3,1,1,1,4,4,0,35,4
+Ukraine,Eropa,3,1,0,2,2,5,0,24,3
+New Zealand,Oseania,3,1,1,1,3,3,1,94,4
+Ivory Coast,Afrika,3,1,1,1,3,3,1,37,4
+Algeria,Afrika,3,1,0,2,3,5,0,43,3
+Cameroon,Afrika,3,1,1,1,4,4,0,49,4
+Ghana,Afrika,3,1,0,2,2,5,0,61,3
+Qatar,Asia,3,0,1,2,1,6,0,55,1
+Iraq,Asia,3,1,0,2,2,5,0,59,3
+Uzbekistan,Asia,3,1,1,1,3,3,1,57,4
+Jordan,Asia,3,1,0,2,2,5,0,68,3
