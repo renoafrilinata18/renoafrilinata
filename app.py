@@ -94,9 +94,6 @@ filtered = champions[
 # HERO
 # ==================================================
 
-st.image(
-    "assets/fifa_banner.jpg",
-    use_container_width=True
 )
 
 st.markdown("""
