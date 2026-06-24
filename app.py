@@ -339,6 +339,208 @@ st.plotly_chart(
     use_container_width=True
 )
 
+# ==================================================
+# TEAM BATTLE ARENA
+# ==================================================
+st.markdown("""
+# ⚔️ Team Battle Arena
+
+Bandingkan dua negara dan lihat siapa yang lebih unggul
+berdasarkan statistik turnamen.
+""")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    team1 = st.selectbox(
+        "Pilih Tim Pertama",
+        df["Negara"],
+        key="team1"
+    )
+
+with col2:
+    team2 = st.selectbox(
+        "Pilih Tim Kedua",
+        df["Negara"],
+        index=1,
+        key="team2"
+    )
+
+t1 = df[df["Negara"] == team1].iloc[0]
+t2 = df[df["Negara"] == team2].iloc[0]
+
+compare = pd.DataFrame({
+    "Statistik":[
+        "Poin",
+        "Goal Masuk",
+        "Goal Kemasukan",
+        "Clean Sheet",
+        "Ranking FIFA",
+        "Power Score"
+    ],
+    team1:[
+        t1["Poin"],
+        t1["Goal_Masuk"],
+        t1["Goal_Kemasukan"],
+        t1["Clean_Sheet"],
+        t1["Ranking_FIFA"],
+        t1["Power_Score"]
+    ],
+    team2:[
+        t2["Poin"],
+        t2["Goal_Masuk"],
+        t2["Goal_Kemasukan"],
+        t2["Clean_Sheet"],
+        t2["Ranking_FIFA"],
+        t2["Power_Score"]
+    ]
+})
+
+st.dataframe(
+    compare,
+    use_container_width=True
+)
+
+st.divider()
+
+# ==================================================
+# TOURNAMENT INTELLIGENCE
+# ==================================================
+terproduktif = df.loc[df["Goal_Masuk"].idxmax()]
+pertahanan = df.loc[df["Clean_Sheet"].idxmax()]
+terbaik = df.loc[df["Power_Score"].idxmax()]
+
+benua_terkuat = (
+    df.groupby("Benua")["Poin"]
+    .sum()
+    .idxmax()
+)
+
+st.markdown("""
+# 🔥 Tournament Intelligence
+
+Analisis otomatis berdasarkan data turnamen.
+""")
+
+st.success(
+    f"⚽ {terproduktif['Negara']} menjadi tim paling produktif dengan "
+    f"{terproduktif['Goal_Masuk']} gol."
+)
+
+st.success(
+    f"🛡️ {pertahanan['Negara']} memiliki pertahanan terbaik dengan "
+    f"{pertahanan['Clean_Sheet']} clean sheet."
+)
+
+st.success(
+    f"🌎 {benua_terkuat} menjadi benua paling dominan "
+    f"berdasarkan total poin."
+)
+
+st.success(
+    f"🏆 {terbaik['Negara']} merupakan kandidat juara utama "
+    f"berdasarkan Power Score."
+)
+
+st.divider()
+
+# ==================================================
+# PREDIKSI JUARA
+# ==================================================
+st.markdown("""
+# 🔮 Road To Glory
+
+Siapa kandidat terkuat untuk mengangkat trofi?
+""")
+
+st.balloons()
+
+st.success(
+    f"""
+🏆 Berdasarkan kombinasi statistik poin, produktivitas gol,
+dan kekuatan pertahanan, **{terbaik['Negara']}**
+menjadi kandidat terkuat untuk menjuarai
+FIFA World Cup 2026.
+
+Negara ini memiliki Power Score tertinggi
+dibandingkan seluruh peserta turnamen.
+"""
+)
+
+# ==================================================
+# TOP 10 RANKING
+# ==================================================
+st.markdown("""
+# 🏅 Official Power Ranking
+
+10 negara terbaik berdasarkan performa keseluruhan.
+""")
+
+top10 = ranking.head(10)
+
+st.dataframe(
+    top10[
+        [
+            "Negara",
+            "Benua",
+            "Poin",
+            "Goal_Masuk",
+            "Clean_Sheet",
+            "Power_Score"
+        ]
+    ],
+    use_container_width=True
+)
+
+# ==================================================
+# HEATMAP VISUAL
+# ==================================================
+st.markdown("""
+# 📊 Tournament Performance Matrix
+
+Visualisasi performa negara berdasarkan poin dan gol.
+""")
+
+fig_heat = px.density_heatmap(
+    df,
+    x="Goal_Masuk",
+    y="Poin",
+    title="Performance Density Map"
+)
+
+st.plotly_chart(
+    fig_heat,
+    use_container_width=True
+)
+
+# ==================================================
+# FINAL WHISTLE
+# ==================================================
+st.markdown("---")
+
+st.markdown("""
+# 📖 Final Whistle
+
+Statistik tidak selalu dapat memprediksi masa depan,
+tetapi mampu menunjukkan siapa yang tampil paling dominan.
+
+Melalui analisis performa, produktivitas gol,
+kekuatan pertahanan, hingga dominasi antar benua,
+dashboard ini memberikan gambaran menyeluruh mengenai
+persaingan menuju trofi FIFA World Cup 2026.
+
+Pada akhirnya hanya satu negara yang akan menjadi juara.
+
+Namun data telah memberikan petunjuk mengenai
+siapa yang paling siap menuliskan sejarah.
+
+---
+
+## ⚽ Data Never Lies. Champions Make History.
+
+🏆 FIFA World Cup 2026 Analytics Hub
+""")
+
 st.divider()
 
 # ==================================================
