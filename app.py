@@ -1,157 +1,258 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
-# =========================
+# ==================================================
 # PAGE CONFIG
-# =========================
+# ==================================================
+
 st.set_page_config(
-    page_title="FIFA World Cup Dashboard",
+    page_title="FIFA World Cup Legends Dashboard",
     page_icon="🏆",
     layout="wide"
 )
 
-# =========================
+# ==================================================
 # LOAD DATA
-# =========================
+# ==================================================
+
 champions = pd.read_csv("world_cup_champions.csv")
 scorers = pd.read_csv("world_cup_top_scorers.csv")
 
-# =========================
-# CUSTOM CSS
-# =========================
+# ==================================================
+# DARK THEME CSS
+# ==================================================
+
 st.markdown("""
 <style>
 
 .main {
-    background-color:#f5f7fa;
+    background-color:#0E1117;
 }
 
-.hero {
-    background: linear-gradient(135deg,#001F54,#00509D);
-    padding:40px;
+[data-testid="stSidebar"]{
+    background-color:#111827;
+}
+
+.hero{
+    background: linear-gradient(135deg,#001F54,#003566);
+    padding:35px;
+    border-radius:20px;
+    color:white;
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.kpi-card{
+    background:#1F2937;
+    padding:20px;
     border-radius:15px;
     text-align:center;
-    color:white;
+    box-shadow:0px 0px 15px rgba(0,255,255,0.2);
+    animation: pulse 2s infinite;
 }
 
-.kpi {
-    background:white;
-    padding:20px;
-    border-radius:12px;
-    text-align:center;
-    box-shadow:0px 2px 10px rgba(0,0,0,0.1);
+@keyframes pulse{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.03);}
+    100%{transform:scale(1);}
+}
+
+.big-number{
+    font-size:32px;
+    font-weight:bold;
+    color:#00E5FF;
+}
+
+.section{
+    background:#1F2937;
+    padding:15px;
+    border-radius:15px;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# =========================
-# HERO SECTION
-# =========================
+# ==================================================
+# SIDEBAR
+# ==================================================
+
+st.sidebar.title("⚙ Dashboard Filter")
+
+selected_country = st.sidebar.multiselect(
+    "Filter Champion",
+    champions["Champion"].unique(),
+    default=champions["Champion"].unique()
+)
+
+filtered = champions[
+    champions["Champion"].isin(selected_country)
+]
+
+# ==================================================
+# HERO
+# ==================================================
+
+st.image(
+    "assets/fifa_banner.jpg",
+    use_container_width=True
+)
 
 st.markdown("""
-<div class="hero">
-<h1>🏆 FIFA World Cup Legends & History Analytics Dashboard</h1>
-<h4>Explore World Cup Champions, Legends, Records & Historical Insights</h4>
+<div class='hero'>
+<h1>🏆 FIFA World Cup Legends & History Analytics</h1>
+<h4>1930 - 2022 Historical Football Intelligence Dashboard</h4>
 </div>
 """, unsafe_allow_html=True)
 
-st.write("")
+# ==================================================
+# KPI SECTION
+# ==================================================
 
-# =========================
-# KPI
-# =========================
+tournament = len(champions)
 
-total_tournaments = champions["Year"].count()
-total_champions = champions["Champion"].nunique()
-total_scorers = scorers["Player"].count()
+champion_count = champions["Champion"].nunique()
 
-c1,c2,c3 = st.columns(3)
+top_scorer_count = len(scorers)
 
-with c1:
-    st.metric("🏆 Total Tournaments", total_tournaments)
+col1,col2,col3 = st.columns(3)
 
-with c2:
-    st.metric("🌎 Champion Countries", total_champions)
+with col1:
+    st.markdown(f"""
+    <div class='kpi-card'>
+    <h4>Tournaments</h4>
+    <div class='big-number'>{tournament}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-with c3:
-    st.metric("⚽ Top Scorers Listed", total_scorers)
+with col2:
+    st.markdown(f"""
+    <div class='kpi-card'>
+    <h4>Champion Nations</h4>
+    <div class='big-number'>{champion_count}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-st.divider()
+with col3:
+    st.markdown(f"""
+    <div class='kpi-card'>
+    <h4>Top Scorers</h4>
+    <div class='big-number'>{top_scorer_count}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-# =========================
-# TIMELINE CHAMPIONS
-# =========================
+st.markdown("---")
+
+# ==================================================
+# TIMELINE
+# ==================================================
 
 st.subheader("🏆 World Cup Champions Timeline")
 
-fig = px.scatter(
-    champions,
+timeline = px.scatter(
+    filtered,
     x="Year",
     y="Champion",
     color="Champion",
-    size=[15]*len(champions)
+    size=[18]*len(filtered),
+    template="plotly_dark"
 )
 
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(
+    timeline,
+    use_container_width=True
+)
 
-# =========================
-# MOST TITLES
-# =========================
-
-st.subheader("🥇 Countries with Most World Cup Titles")
+# ==================================================
+# TITLES BAR
+# ==================================================
 
 titles = champions["Champion"].value_counts().reset_index()
-titles.columns=["Country","Titles"]
+titles.columns = ["Country","Titles"]
 
-fig2 = px.bar(
+st.subheader("🥇 Championship Ranking")
+
+rank_fig = px.bar(
     titles,
     x="Country",
     y="Titles",
     color="Titles",
-    text="Titles"
+    text="Titles",
+    template="plotly_dark"
 )
 
-st.plotly_chart(fig2, use_container_width=True)
+st.plotly_chart(rank_fig, use_container_width=True)
 
-# =========================
+# ==================================================
+# PIE CHART
+# ==================================================
+
+st.subheader("🥧 World Cup Title Distribution")
+
+pie = px.pie(
+    titles,
+    values="Titles",
+    names="Country",
+    hole=0.4,
+    template="plotly_dark"
+)
+
+st.plotly_chart(pie, use_container_width=True)
+
+# ==================================================
+# TREEMAP
+# ==================================================
+
+st.subheader("🌎 Treemap Championship Distribution")
+
+tree = px.treemap(
+    titles,
+    path=["Country"],
+    values="Titles",
+    color="Titles"
+)
+
+st.plotly_chart(tree, use_container_width=True)
+
+# ==================================================
 # TOP SCORERS
-# =========================
+# ==================================================
 
-st.subheader("⚽ World Cup All-Time Top Scorers")
+st.subheader("⚽ Top World Cup Scorers")
 
 top10 = scorers.sort_values(
     "Goals",
     ascending=False
 ).head(10)
 
-fig3 = px.bar(
+goal_fig = px.bar(
     top10,
     x="Goals",
     y="Player",
-    color="Goals",
     orientation="h",
-    text="Goals"
+    color="Goals",
+    text="Goals",
+    template="plotly_dark"
 )
 
-st.plotly_chart(fig3, use_container_width=True)
+st.plotly_chart(goal_fig, use_container_width=True)
 
-# =========================
+# ==================================================
 # PLAYER COMPARISON
-# =========================
+# ==================================================
 
 st.subheader("🆚 Player Comparison")
 
-col1,col2 = st.columns(2)
+c1,c2 = st.columns(2)
 
-player1 = col1.selectbox(
-    "Select Player 1",
+player1 = c1.selectbox(
+    "Player 1",
     scorers["Player"]
 )
 
-player2 = col2.selectbox(
-    "Select Player 2",
+player2 = c2.selectbox(
+    "Player 2",
     scorers["Player"],
     index=1
 )
@@ -160,87 +261,155 @@ compare = scorers[
     scorers["Player"].isin([player1,player2])
 ]
 
-fig4 = px.bar(
+compare_fig = px.bar(
     compare,
     x="Player",
     y=["Goals","Matches"],
-    barmode="group"
+    barmode="group",
+    template="plotly_dark"
 )
 
-st.plotly_chart(fig4, use_container_width=True)
+st.plotly_chart(compare_fig, use_container_width=True)
 
-# =========================
+# ==================================================
 # GOALS VS MATCHES
-# =========================
+# ==================================================
 
-st.subheader("📈 Goals vs Matches Analysis")
+st.subheader("📈 Goals vs Matches")
 
-fig5 = px.scatter(
+scatter = px.scatter(
     scorers,
     x="Matches",
     y="Goals",
-    color="Country",
     size="Goals",
-    hover_name="Player"
+    color="Country",
+    hover_name="Player",
+    template="plotly_dark"
 )
 
-st.plotly_chart(fig5, use_container_width=True)
+st.plotly_chart(scatter, use_container_width=True)
 
-# =========================
-# INSIGHT
-# =========================
+# ==================================================
+# HEATMAP
+# ==================================================
 
-st.subheader("🧠 Automatic Insights")
+st.subheader("🔥 Performance Heatmap")
+
+heat = scorers.copy()
+
+heat["Efficiency"] = (
+    heat["Goals"] /
+    heat["Matches"]
+).round(2)
+
+heatmap = go.Figure(
+    data=go.Heatmap(
+        z=[heat["Efficiency"]],
+        x=heat["Player"],
+        y=["Goal Efficiency"]
+    )
+)
+
+heatmap.update_layout(
+    template="plotly_dark",
+    height=300
+)
+
+st.plotly_chart(
+    heatmap,
+    use_container_width=True
+)
+
+# ==================================================
+# RANKING TABLE
+# ==================================================
+
+st.subheader("🏅 World Cup Legend Ranking")
+
+ranking = scorers.sort_values(
+    ["Goals","Matches"],
+    ascending=[False,True]
+)
+
+ranking.insert(
+    0,
+    "Rank",
+    range(1,len(ranking)+1)
+)
+
+st.dataframe(
+    ranking,
+    use_container_width=True
+)
+
+# ==================================================
+# INSIGHTS
+# ==================================================
+
+st.subheader("🧠 Automated Insights")
 
 top_country = titles.iloc[0]["Country"]
-top_title = titles.iloc[0]["Titles"]
+top_titles = titles.iloc[0]["Titles"]
 
-top_player = scorers.iloc[
-    scorers["Goals"].idxmax()
-]["Player"]
+best_player = scorers.loc[
+    scorers["Goals"].idxmax(),
+    "Player"
+]
 
-top_goals = scorers["Goals"].max()
+best_goal = scorers["Goals"].max()
 
-st.success(
-f"""
-• Country with most titles: {top_country} ({top_title} titles)
+st.success(f"""
 
-• Greatest scorer: {top_player} ({top_goals} goals)
+🏆 Most Successful Nation: {top_country}
 
-• Germany and Brazil dominate both championships and scoring records.
+🥇 Total Titles: {top_titles}
 
-• Lionel Messi and Mbappe are active legends still shaping World Cup history.
-"""
-)
+⚽ Greatest Scorer: {best_player}
 
-# =========================
-# DATA TABLE
-# =========================
+🎯 Total Goals: {best_goal}
 
-st.subheader("📋 Complete Dataset")
+📊 Germany dominates both title races and top scorer records.
 
-tab1,tab2 = st.tabs(
-    ["Champions Data","Top Scorer Data"]
-)
+🌟 Lionel Messi and Kylian Mbappé represent the modern era of World Cup legends.
+
+""")
+
+# ==================================================
+# DATASET
+# ==================================================
+
+st.subheader("📋 Full Dataset")
+
+tab1,tab2 = st.tabs([
+    "Champions",
+    "Top Scorers"
+])
 
 with tab1:
-    st.dataframe(champions,
-                 use_container_width=True)
+    st.dataframe(
+        champions,
+        use_container_width=True
+    )
 
 with tab2:
-    st.dataframe(scorers,
-                 use_container_width=True)
+    st.dataframe(
+        scorers,
+        use_container_width=True
+    )
 
-# =========================
+# ==================================================
 # CONCLUSION
-# =========================
+# ==================================================
 
-st.subheader("📌 Final Conclusion")
+st.subheader("📌 Executive Summary")
 
 st.info("""
-The FIFA World Cup has produced legendary champions and players across generations.
+The FIFA World Cup is the most prestigious football tournament in history.
 
-Brazil remains the most successful nation, while Miroslav Klose holds the all-time scoring record.
+Brazil remains the most successful nation in terms of championships,
+while Miroslav Klose holds the all-time World Cup scoring record.
 
-The analysis demonstrates how football history can be explored through data visualization, helping identify trends, dominance periods, and player achievements over time.
+Interactive analytics reveal long-term dominance trends,
+player efficiency, championship distribution,
+and historical evolution of football greatness.
 """)
