@@ -3,10 +3,10 @@ import pandas as pd
 import plotly.express as px
 
 # ==================================================
-# KONFIGURASI HALAMAN
+# PAGE CONFIG
 # ==================================================
 st.set_page_config(
-    page_title="FIFA World Cup 2026 Analytics Hub",
+    page_title="FIFA World Cup 2026 Command Center",
     page_icon="🏆",
     layout="wide"
 )
@@ -17,36 +17,37 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-.main {
-    background-color: #0E1117;
+.main{
+    background-color:#0E1117;
+}
+
+h1,h2,h3,h4{
+    color:white;
 }
 
 [data-testid="metric-container"]{
-    background: linear-gradient(135deg,#1E293B,#334155);
-    border-radius:15px;
+    background:linear-gradient(135deg,#1E293B,#334155);
+    border-radius:18px;
     padding:20px;
-    box-shadow:0px 0px 15px rgba(0,0,0,0.3);
-}
-
-h1,h2,h3{
-    color:white;
+    border:1px solid #475569;
+    box-shadow:0px 0px 20px rgba(59,130,246,0.3);
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 # ==================================================
-# MEMBACA DATA
+# LOAD DATA
 # ==================================================
 df = pd.read_csv("data_pialadunia.csv")
 
 # ==================================================
 # SIDEBAR
 # ==================================================
-st.sidebar.title("🏆 FIFA WORLD CUP 2026")
+st.sidebar.title("🏆 FIFA World Cup 2026")
 
 benua = st.sidebar.multiselect(
-    "Pilih Benua",
+    "Filter Benua",
     options=df["Benua"].unique(),
     default=df["Benua"].unique()
 )
@@ -57,40 +58,43 @@ df = df[df["Benua"].isin(benua)]
 # POWER SCORE
 # ==================================================
 df["Power_Score"] = (
-    df["Poin"] * 10 +
-    df["Goal_Masuk"] * 2 +
-    df["Clean_Sheet"] * 3
+    df["Poin"] * 10
+    + df["Goal_Masuk"] * 2
+    + df["Clean_Sheet"] * 3
 )
 
 # ==================================================
-# HERO SECTION
+# HERO BANNER
 # ==================================================
-st.title("🏆 FIFA World Cup 2026 Analytics Hub")
-
 st.markdown("""
-### *Exploring Performance, Dominance, and the Road to Glory*
+<div style="
+background: linear-gradient(90deg,#0f172a,#1e3a8a,#7c3aed);
+padding:45px;
+border-radius:25px;
+text-align:center;
+color:white;
+margin-bottom:25px;
+box-shadow:0px 0px 30px rgba(124,58,237,0.5);
+">
 
-Selamat datang di **FIFA World Cup 2026 Analytics Hub**, sebuah dashboard
-interaktif yang dirancang untuk mengungkap cerita di balik angka dan statistik.
+<h1>🏆 FIFA WORLD CUP 2026 COMMAND CENTER</h1>
 
-Piala Dunia bukan sekadar tentang menang atau kalah. Setiap pertandingan
-menghasilkan data yang menggambarkan kekuatan tim, efektivitas strategi,
-ketajaman lini serang, hingga ketangguhan pertahanan.
+<h3>The Ultimate Football Analytics Experience</h3>
 
-Melalui visualisasi dan analisis yang disajikan, dashboard ini membantu
-mengidentifikasi negara-negara yang paling dominan, tim dengan performa
-terbaik, serta kandidat terkuat untuk mengangkat trofi Piala Dunia 2026.
+<h4>⚽ 48 Nations • 🌎 6 Continents • 🏆 One Champion</h4>
 
-⚽ Analisis Performa Tim  
-🛡️ Evaluasi Kekuatan Pertahanan  
-🌎 Dominasi Antar Benua  
-🏆 Prediksi Kandidat Juara Dunia  
+<p>
+Explore team performance, group standings,
+continental dominance and championship predictions.
+</p>
 
-*"Every statistic tells a story. Every match creates history."*
-""")
+<h4><i>The Road To Glory Begins Here</i></h4>
+
+</div>
+""", unsafe_allow_html=True)
 
 st.info(
-    "📌 Gunakan filter benua pada sidebar untuk melakukan analisis yang lebih spesifik."
+    "📌 Gunakan filter benua di sidebar untuk melakukan analisis lebih spesifik."
 )
 
 st.divider()
@@ -101,73 +105,199 @@ st.divider()
 col1,col2,col3,col4 = st.columns(4)
 
 with col1:
-    st.metric("🌍 Total Negara", len(df))
+    st.metric(
+        "🌍 Total Negara",
+        len(df)
+    )
 
 with col2:
-    st.metric("⚽ Total Gol", int(df["Goal_Masuk"].sum()))
+    st.metric(
+        "⚽ Total Gol",
+        int(df["Goal_Masuk"].sum())
+    )
 
 with col3:
-    st.metric("🏅 Total Poin", int(df["Poin"].sum()))
+    st.metric(
+        "🏅 Total Poin",
+        int(df["Poin"].sum())
+    )
 
 with col4:
-    st.metric("🛡️ Clean Sheet", int(df["Clean_Sheet"].sum()))
+    st.metric(
+        "🛡️ Clean Sheet",
+        int(df["Clean_Sheet"].sum())
+    )
 
 st.divider()
 
 # ==================================================
-# TOP 5 KANDIDAT JUARA
+# PODIUM JUARA
 # ==================================================
-st.markdown("""
-## 🏆 Race for the Trophy
+top5 = (
+    df.sort_values(
+        "Power_Score",
+        ascending=False
+    )
+    .head(5)
+)
 
-Persaingan menuju gelar juara dunia semakin menarik untuk dianalisis.
-Berdasarkan kombinasi poin, produktivitas gol, dan kekuatan pertahanan,
-berikut adalah negara-negara yang memiliki peluang terbesar untuk menjadi
-penguasa sepak bola dunia.
+st.markdown("""
+# 🏅 Championship Podium
+
+Berikut adalah negara dengan performa terbaik
+berdasarkan kombinasi poin, produktivitas gol,
+dan kekuatan pertahanan.
 """)
 
-top5 = df.sort_values(
-    "Power_Score",
-    ascending=False
-).head(5)
+col1,col2,col3 = st.columns(3)
+
+with col1:
+    st.metric(
+        "🥈 Runner Up",
+        top5.iloc[1]["Negara"],
+        top5.iloc[1]["Power_Score"]
+    )
+
+with col2:
+    st.metric(
+        "🥇 Favorite Champion",
+        top5.iloc[0]["Negara"],
+        top5.iloc[0]["Power_Score"]
+    )
+
+with col3:
+    st.metric(
+        "🥉 Third Place",
+        top5.iloc[2]["Negara"],
+        top5.iloc[2]["Power_Score"]
+    )
+
+st.balloons()
+
+# ==================================================
+# TOP 5 POWER SCORE
+# ==================================================
+fig_top = px.bar(
+    top5,
+    x="Negara",
+    y="Power_Score",
+    color="Power_Score",
+    title="🏆 Top 5 Championship Contenders"
+)
+
+st.plotly_chart(
+    fig_top,
+    use_container_width=True
+)
+
+# ==================================================
+# WINNER PROBABILITY
+# ==================================================
+st.markdown("""
+# 🔮 World Cup Winner Probability
+
+Prediksi peluang juara berdasarkan
+Power Score masing-masing negara.
+""")
+
+prob = top5.copy()
+
+prob["Probability"] = (
+    prob["Power_Score"]
+    /
+    prob["Power_Score"].sum()
+    * 100
+)
+
+for _, row in prob.iterrows():
+
+    st.write(
+        f"🏆 {row['Negara']} ({row['Probability']:.1f}%)"
+    )
+
+    st.progress(
+        int(row["Probability"])
+    )
+
+st.divider()
+# ==================================================
+# GROUP STAGE STANDINGS
+# ==================================================
+st.markdown("""
+# 🏟️ FIFA World Cup Group Stage
+
+Fase grup menjadi fondasi perjalanan menuju gelar juara dunia.
+Pilih grup untuk melihat klasemen dan tim yang berpotensi lolos.
+""")
+
+grup_pilih = st.selectbox(
+    "Pilih Grup",
+    sorted(df["Grup"].unique())
+)
+
+grup_df = (
+    df[df["Grup"] == grup_pilih]
+    .sort_values(
+        ["Poin", "Goal_Masuk"],
+        ascending=False
+    )
+)
+
+st.subheader(f"🏆 Klasemen Grup {grup_pilih}")
 
 st.dataframe(
-    top5[
+    grup_df[
         [
             "Negara",
             "Poin",
             "Goal_Masuk",
-            "Clean_Sheet",
-            "Power_Score"
+            "Goal_Kemasukan",
+            "Clean_Sheet"
         ]
     ],
     use_container_width=True
 )
 
-fig1 = px.bar(
-    top5,
+fig_group = px.bar(
+    grup_df,
     x="Negara",
-    y="Power_Score",
-    color="Power_Score",
-    title="🏆 Top 5 Kandidat Juara Dunia"
+    y="Poin",
+    color="Poin",
+    title=f"Klasemen Grup {grup_pilih}"
 )
 
-st.plotly_chart(fig1, use_container_width=True)
+st.plotly_chart(
+    fig_group,
+    use_container_width=True
+)
+
+juara_grup = grup_df.iloc[0]
+
+st.success(
+    f"🥇 Pemuncak Grup {grup_pilih}: {juara_grup['Negara']} "
+    f"dengan {juara_grup['Poin']} poin."
+)
+
+lolos = grup_df.head(2)
+
+st.info(
+    f"✅ Prediksi Lolos Babak Berikutnya: "
+    f"{lolos.iloc[0]['Negara']} dan "
+    f"{lolos.iloc[1]['Negara']}"
+)
+
+st.divider()
 
 # ==================================================
-# PRODUKTIVITAS GOL
+# GOAL MACHINES
 # ==================================================
 st.markdown("""
-## ⚽ The Goal Machines
+# ⚽ The Goal Machines
 
-Gol adalah mata uang utama dalam sepak bola.
-
-Bagian ini menampilkan negara-negara dengan produktivitas serangan
-tertinggi sepanjang kompetisi. Semakin banyak gol yang dicetak,
-semakin besar peluang tim untuk mengendalikan pertandingan.
+Negara-negara dengan produktivitas gol tertinggi sepanjang kompetisi.
 """)
 
-fig2 = px.bar(
+fig_goal = px.bar(
     df.sort_values(
         "Goal_Masuk",
         ascending=False
@@ -175,25 +305,25 @@ fig2 = px.bar(
     x="Negara",
     y="Goal_Masuk",
     color="Goal_Masuk",
-    title="Negara dengan Goal Terbanyak"
+    title="Top Goal Scoring Nations"
 )
 
-st.plotly_chart(fig2, use_container_width=True)
+st.plotly_chart(
+    fig_goal,
+    use_container_width=True
+)
 
 # ==================================================
-# PERTAHANAN
+# DEFENSE WALL
 # ==================================================
 st.markdown("""
-## 🛡️ The Wall of Defense
+# 🛡️ The Wall of Defense
 
-Tim juara tidak hanya membutuhkan serangan yang tajam,
-tetapi juga pertahanan yang solid.
-
-Analisis berikut menunjukkan negara-negara yang mampu menjaga
-stabilitas permainan dengan meminimalkan peluang lawan.
+Pertahanan terbaik sering kali menjadi pembeda
+antara tim bagus dan tim juara.
 """)
 
-fig3 = px.bar(
+fig_def = px.bar(
     df.sort_values(
         "Clean_Sheet",
         ascending=False
@@ -201,21 +331,23 @@ fig3 = px.bar(
     x="Negara",
     y="Clean_Sheet",
     color="Clean_Sheet",
-    title="Kekuatan Pertahanan Negara Peserta"
+    title="Best Defensive Teams"
 )
 
-st.plotly_chart(fig3, use_container_width=True)
+st.plotly_chart(
+    fig_def,
+    use_container_width=True
+)
+
+st.divider()
 
 # ==================================================
-# BENUA
+# CONTINENTAL DOMINANCE
 # ==================================================
 st.markdown("""
-## 🌎 Continental Dominance
+# 🌎 Continental Dominance
 
-Piala Dunia mempertemukan berbagai gaya bermain dari seluruh dunia.
-
-Analisis ini memperlihatkan bagaimana setiap benua berkontribusi
-terhadap persaingan global dan siapa yang mendominasi turnamen.
+Perbandingan kekuatan antar benua berdasarkan total poin.
 """)
 
 benua_data = (
@@ -224,30 +356,32 @@ benua_data = (
     .reset_index()
 )
 
-fig4 = px.pie(
+fig_benua = px.pie(
     benua_data,
     names="Benua",
     values="Poin",
     hole=0.5,
-    title="Distribusi Poin Berdasarkan Benua"
+    title="Point Distribution by Continent"
 )
 
-st.plotly_chart(fig4, use_container_width=True)
+st.plotly_chart(
+    fig_benua,
+    use_container_width=True
+)
+
+st.divider()
 
 # ==================================================
-# SCATTER
+# GOAL VS POINTS
 # ==================================================
 st.markdown("""
-## 📈 Goal vs Points Analysis
+# 📈 Goal vs Points Analysis
 
-Visualisasi berikut menunjukkan hubungan antara jumlah gol
-yang dicetak dengan total poin yang diperoleh setiap negara.
-
-Semakin besar ukuran lingkaran, semakin tinggi kekuatan
-keseluruhan negara tersebut berdasarkan Power Score.
+Hubungan antara jumlah gol dan poin yang diperoleh.
+Semakin besar lingkaran, semakin tinggi Power Score.
 """)
 
-fig5 = px.scatter(
+fig_scatter = px.scatter(
     df,
     x="Goal_Masuk",
     y="Poin",
@@ -256,72 +390,36 @@ fig5 = px.scatter(
     hover_name="Negara"
 )
 
-st.plotly_chart(fig5, use_container_width=True)
-
-# ==================================================
-# INSIGHT
-# ==================================================
-terproduktif = df.loc[df["Goal_Masuk"].idxmax()]
-terbaik = df.loc[df["Power_Score"].idxmax()]
-pertahanan = df.loc[df["Clean_Sheet"].idxmax()]
-
-st.markdown("## 🔥 Tournament Insights")
-
-st.success(f"⚽ Negara paling produktif: {terproduktif['Negara']} ({terproduktif['Goal_Masuk']} gol)")
-st.success(f"🛡️ Pertahanan terbaik: {pertahanan['Negara']} ({pertahanan['Clean_Sheet']} clean sheet)")
-st.success(f"🏆 Kandidat juara terkuat: {terbaik['Negara']}")
-
-# ==================================================
-# PREDIKSI JUARA
-# ==================================================
-st.markdown("## 🔮 Road to Glory")
-
-st.success(
-    f"""
-🏆 Berdasarkan kombinasi statistik poin, jumlah gol,
-dan kekuatan pertahanan, {terbaik['Negara']}
-muncul sebagai kandidat terkuat untuk menjuarai
-FIFA World Cup 2026.
-
-Konsistensi performa mereka menunjukkan dominasi
-yang lebih baik dibandingkan negara peserta lainnya.
-"""
+st.plotly_chart(
+    fig_scatter,
+    use_container_width=True
 )
 
 # ==================================================
-# TABEL
+# POWER RANKING
 # ==================================================
-st.subheader("📋 Statistik Lengkap Peserta")
+st.markdown("""
+# 🌟 Power Ranking
+
+15 negara dengan Power Score tertinggi.
+""")
 
 ranking = df.sort_values(
     "Power_Score",
     ascending=False
 )
 
-st.dataframe(
-    ranking,
+fig_rank = px.line(
+    ranking.head(15),
+    x="Negara",
+    y="Power_Score",
+    markers=True,
+    title="Top 15 Power Ranking"
+)
+
+st.plotly_chart(
+    fig_rank,
     use_container_width=True
 )
 
-# ==================================================
-# PENUTUP
-# ==================================================
-st.markdown("---")
-
-st.markdown("""
-# 📖 Final Whistle
-
-Statistik memang tidak dapat meramalkan masa depan dengan sempurna,
-namun mampu memberikan gambaran mengenai siapa yang tampil paling dominan
-sepanjang kompetisi.
-
-Dari ketajaman lini serang hingga kokohnya pertahanan, setiap angka
-menceritakan perjalanan sebuah negara dalam mengejar kejayaan di panggung
-sepak bola terbesar di dunia.
-
-Pada akhirnya, hanya satu negara yang akan mengangkat trofi.
-Namun berdasarkan data yang tersedia, kita dapat melihat siapa yang
-paling siap untuk menuliskan sejarah baru di FIFA World Cup 2026.
-
-### ⚽ Data Never Lies. Champions Make History.
-""")
+st.divider()
