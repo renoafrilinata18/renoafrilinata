@@ -94,8 +94,6 @@ filtered = champions[
 # HERO
 # ==================================================
 
-)
-
 st.markdown("""
 <div class='hero'>
 <h1>🏆 FIFA World Cup Legends & History Analytics</h1>
