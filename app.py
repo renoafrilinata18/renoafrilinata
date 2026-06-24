@@ -2,626 +2,245 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# ==================================================
+# =========================
 # PAGE CONFIG
-# ==================================================
+# =========================
 st.set_page_config(
-    page_title="FIFA World Cup 2026 Command Center",
+    page_title="FIFA World Cup Dashboard",
     page_icon="🏆",
     layout="wide"
 )
 
-# ==================================================
+# =========================
+# LOAD DATA
+# =========================
+champions = pd.read_csv("world_cup_champions.csv")
+scorers = pd.read_csv("world_cup_top_scorers.csv")
+
+# =========================
 # CUSTOM CSS
-# ==================================================
+# =========================
 st.markdown("""
 <style>
 
-.main{
-    background-color:#0E1117;
+.main {
+    background-color:#f5f7fa;
 }
 
-h1,h2,h3,h4{
+.hero {
+    background: linear-gradient(135deg,#001F54,#00509D);
+    padding:40px;
+    border-radius:15px;
+    text-align:center;
     color:white;
 }
 
-[data-testid="metric-container"]{
-    background:linear-gradient(135deg,#1E293B,#334155);
-    border-radius:18px;
+.kpi {
+    background:white;
     padding:20px;
-    border:1px solid #475569;
-    box-shadow:0px 0px 20px rgba(59,130,246,0.3);
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0px 2px 10px rgba(0,0,0,0.1);
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# ==================================================
-# LOAD DATA
-# ==================================================
-df = pd.read_csv("data_pialadunia.csv")
+# =========================
+# HERO SECTION
+# =========================
 
-# ==================================================
-# SIDEBAR
-# ==================================================
-st.sidebar.title("🏆 FIFA World Cup 2026")
-
-benua = st.sidebar.multiselect(
-    "Filter Benua",
-    options=df["Benua"].unique(),
-    default=df["Benua"].unique()
-)
-
-df = df[df["Benua"].isin(benua)]
-
-# ==================================================
-# POWER SCORE
-# ==================================================
-df["Power_Score"] = (
-    df["Poin"] * 10
-    + df["Goal_Masuk"] * 2
-    + df["Clean_Sheet"] * 3
-)
-
-# ==================================================
-# HERO BANNER
-# ==================================================
 st.markdown("""
-<div style="
-background: linear-gradient(90deg,#0f172a,#1e3a8a,#7c3aed);
-padding:45px;
-border-radius:25px;
-text-align:center;
-color:white;
-margin-bottom:25px;
-box-shadow:0px 0px 30px rgba(124,58,237,0.5);
-">
-
-<h1>🏆 FIFA WORLD CUP 2026 COMMAND CENTER</h1>
-
-<h3>The Ultimate Football Analytics Experience</h3>
-
-<h4>⚽ 48 Nations • 🌎 6 Continents • 🏆 One Champion</h4>
-
-<p>
-Explore team performance, group standings,
-continental dominance and championship predictions.
-</p>
-
-<h4><i>The Road To Glory Begins Here</i></h4>
-
+<div class="hero">
+<h1>🏆 FIFA World Cup Legends & History Analytics Dashboard</h1>
+<h4>Explore World Cup Champions, Legends, Records & Historical Insights</h4>
 </div>
 """, unsafe_allow_html=True)
 
-st.info(
-    "📌 Gunakan filter benua di sidebar untuk melakukan analisis lebih spesifik."
-)
+st.write("")
 
-st.divider()
-
-# ==================================================
+# =========================
 # KPI
-# ==================================================
-col1,col2,col3,col4 = st.columns(4)
+# =========================
 
-with col1:
-    st.metric(
-        "🌍 Total Negara",
-        len(df)
-    )
+total_tournaments = champions["Year"].count()
+total_champions = champions["Champion"].nunique()
+total_scorers = scorers["Player"].count()
 
-with col2:
-    st.metric(
-        "⚽ Total Gol",
-        int(df["Goal_Masuk"].sum())
-    )
+c1,c2,c3 = st.columns(3)
 
-with col3:
-    st.metric(
-        "🏅 Total Poin",
-        int(df["Poin"].sum())
-    )
+with c1:
+    st.metric("🏆 Total Tournaments", total_tournaments)
 
-with col4:
-    st.metric(
-        "🛡️ Clean Sheet",
-        int(df["Clean_Sheet"].sum())
-    )
+with c2:
+    st.metric("🌎 Champion Countries", total_champions)
+
+with c3:
+    st.metric("⚽ Top Scorers Listed", total_scorers)
 
 st.divider()
 
-# ==================================================
-# PODIUM JUARA
-# ==================================================
-top5 = (
-    df.sort_values(
-        "Power_Score",
-        ascending=False
-    )
-    .head(5)
+# =========================
+# TIMELINE CHAMPIONS
+# =========================
+
+st.subheader("🏆 World Cup Champions Timeline")
+
+fig = px.scatter(
+    champions,
+    x="Year",
+    y="Champion",
+    color="Champion",
+    size=[15]*len(champions)
 )
 
-st.markdown("""
-# 🏅 Championship Podium
+st.plotly_chart(fig, use_container_width=True)
 
-Berikut adalah negara dengan performa terbaik
-berdasarkan kombinasi poin, produktivitas gol,
-dan kekuatan pertahanan.
-""")
+# =========================
+# MOST TITLES
+# =========================
 
-col1,col2,col3 = st.columns(3)
+st.subheader("🥇 Countries with Most World Cup Titles")
 
-with col1:
-    st.metric(
-        "🥈 Runner Up",
-        top5.iloc[1]["Negara"],
-        top5.iloc[1]["Power_Score"]
-    )
+titles = champions["Champion"].value_counts().reset_index()
+titles.columns=["Country","Titles"]
 
-with col2:
-    st.metric(
-        "🥇 Favorite Champion",
-        top5.iloc[0]["Negara"],
-        top5.iloc[0]["Power_Score"]
-    )
-
-with col3:
-    st.metric(
-        "🥉 Third Place",
-        top5.iloc[2]["Negara"],
-        top5.iloc[2]["Power_Score"]
-    )
-
-st.balloons()
-
-# ==================================================
-# TOP 5 POWER SCORE
-# ==================================================
-fig_top = px.bar(
-    top5,
-    x="Negara",
-    y="Power_Score",
-    color="Power_Score",
-    title="🏆 Top 5 Championship Contenders"
+fig2 = px.bar(
+    titles,
+    x="Country",
+    y="Titles",
+    color="Titles",
+    text="Titles"
 )
 
-st.plotly_chart(
-    fig_top,
-    use_container_width=True
+st.plotly_chart(fig2, use_container_width=True)
+
+# =========================
+# TOP SCORERS
+# =========================
+
+st.subheader("⚽ World Cup All-Time Top Scorers")
+
+top10 = scorers.sort_values(
+    "Goals",
+    ascending=False
+).head(10)
+
+fig3 = px.bar(
+    top10,
+    x="Goals",
+    y="Player",
+    color="Goals",
+    orientation="h",
+    text="Goals"
 )
 
-# ==================================================
-# WINNER PROBABILITY
-# ==================================================
-st.markdown("""
-# 🔮 World Cup Winner Probability
+st.plotly_chart(fig3, use_container_width=True)
 
-Prediksi peluang juara berdasarkan
-Power Score masing-masing negara.
-""")
+# =========================
+# PLAYER COMPARISON
+# =========================
 
-prob = top5.copy()
+st.subheader("🆚 Player Comparison")
 
-prob["Probability"] = (
-    prob["Power_Score"]
-    /
-    prob["Power_Score"].sum()
-    * 100
+col1,col2 = st.columns(2)
+
+player1 = col1.selectbox(
+    "Select Player 1",
+    scorers["Player"]
 )
 
-for _, row in prob.iterrows():
-
-    st.write(
-        f"🏆 {row['Negara']} ({row['Probability']:.1f}%)"
-    )
-
-    st.progress(
-        int(row["Probability"])
-    )
-
-st.divider()
-# ==================================================
-# GROUP STAGE STANDINGS
-# ==================================================
-st.markdown("""
-# 🏟️ FIFA World Cup Group Stage
-
-Fase grup menjadi fondasi perjalanan menuju gelar juara dunia.
-Pilih grup untuk melihat klasemen dan tim yang berpotensi lolos.
-""")
-
-grup_pilih = st.selectbox(
-    "Pilih Grup",
-    sorted(df["Grup"].unique())
+player2 = col2.selectbox(
+    "Select Player 2",
+    scorers["Player"],
+    index=1
 )
 
-grup_df = (
-    df[df["Grup"] == grup_pilih]
-    .sort_values(
-        ["Poin", "Goal_Masuk"],
-        ascending=False
-    )
-)
+compare = scorers[
+    scorers["Player"].isin([player1,player2])
+]
 
-st.subheader(f"🏆 Klasemen Grup {grup_pilih}")
-
-st.dataframe(
-    grup_df[
-        [
-            "Negara",
-            "Poin",
-            "Goal_Masuk",
-            "Goal_Kemasukan",
-            "Clean_Sheet"
-        ]
-    ],
-    use_container_width=True
-)
-
-fig_group = px.bar(
-    grup_df,
-    x="Negara",
-    y="Poin",
-    color="Poin",
-    title=f"Klasemen Grup {grup_pilih}"
-)
-
-st.plotly_chart(
-    fig_group,
-    use_container_width=True
-)
-
-juara_grup = grup_df.iloc[0]
-
-st.success(
-    f"🥇 Pemuncak Grup {grup_pilih}: {juara_grup['Negara']} "
-    f"dengan {juara_grup['Poin']} poin."
-)
-
-lolos = grup_df.head(2)
-
-st.info(
-    f"✅ Prediksi Lolos Babak Berikutnya: "
-    f"{lolos.iloc[0]['Negara']} dan "
-    f"{lolos.iloc[1]['Negara']}"
-)
-
-st.divider()
-
-# ==================================================
-# GOAL MACHINES
-# ==================================================
-st.markdown("""
-# ⚽ The Goal Machines
-
-Negara-negara dengan produktivitas gol tertinggi sepanjang kompetisi.
-""")
-
-fig_goal = px.bar(
-    df.sort_values(
-        "Goal_Masuk",
-        ascending=False
-    ),
-    x="Negara",
-    y="Goal_Masuk",
-    color="Goal_Masuk",
-    title="Top Goal Scoring Nations"
-)
-
-st.plotly_chart(
-    fig_goal,
-    use_container_width=True
-)
-
-# ==================================================
-# DEFENSE WALL
-# ==================================================
-st.markdown("""
-# 🛡️ The Wall of Defense
-
-Pertahanan terbaik sering kali menjadi pembeda
-antara tim bagus dan tim juara.
-""")
-
-fig_def = px.bar(
-    df.sort_values(
-        "Clean_Sheet",
-        ascending=False
-    ),
-    x="Negara",
-    y="Clean_Sheet",
-    color="Clean_Sheet",
-    title="Best Defensive Teams"
-)
-
-st.plotly_chart(
-    fig_def,
-    use_container_width=True
-)
-
-# ==================================================
-# TEAM BATTLE ARENA
-# ==================================================
-st.markdown("""
-# ⚔️ Team Battle Arena
-
-Bandingkan dua negara dan lihat siapa yang lebih unggul
-berdasarkan statistik turnamen.
-""")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    team1 = st.selectbox(
-        "Pilih Tim Pertama",
-        df["Negara"],
-        key="team1"
-    )
-
-with col2:
-    team2 = st.selectbox(
-        "Pilih Tim Kedua",
-        df["Negara"],
-        index=1,
-        key="team2"
-    )
-
-t1 = df[df["Negara"] == team1].iloc[0]
-t2 = df[df["Negara"] == team2].iloc[0]
-
-compare = pd.DataFrame({
-    "Statistik":[
-        "Poin",
-        "Goal Masuk",
-        "Goal Kemasukan",
-        "Clean Sheet",
-        "Ranking FIFA",
-        "Power Score"
-    ],
-    team1:[
-        t1["Poin"],
-        t1["Goal_Masuk"],
-        t1["Goal_Kemasukan"],
-        t1["Clean_Sheet"],
-        t1["Ranking_FIFA"],
-        t1["Power_Score"]
-    ],
-    team2:[
-        t2["Poin"],
-        t2["Goal_Masuk"],
-        t2["Goal_Kemasukan"],
-        t2["Clean_Sheet"],
-        t2["Ranking_FIFA"],
-        t2["Power_Score"]
-    ]
-})
-
-st.dataframe(
+fig4 = px.bar(
     compare,
-    use_container_width=True
+    x="Player",
+    y=["Goals","Matches"],
+    barmode="group"
 )
 
-st.divider()
+st.plotly_chart(fig4, use_container_width=True)
 
-# ==================================================
-# TOURNAMENT INTELLIGENCE
-# ==================================================
-terproduktif = df.loc[df["Goal_Masuk"].idxmax()]
-pertahanan = df.loc[df["Clean_Sheet"].idxmax()]
-terbaik = df.loc[df["Power_Score"].idxmax()]
+# =========================
+# GOALS VS MATCHES
+# =========================
 
-benua_terkuat = (
-    df.groupby("Benua")["Poin"]
-    .sum()
-    .idxmax()
+st.subheader("📈 Goals vs Matches Analysis")
+
+fig5 = px.scatter(
+    scorers,
+    x="Matches",
+    y="Goals",
+    color="Country",
+    size="Goals",
+    hover_name="Player"
 )
 
-st.markdown("""
-# 🔥 Tournament Intelligence
+st.plotly_chart(fig5, use_container_width=True)
 
-Analisis otomatis berdasarkan data turnamen.
-""")
+# =========================
+# INSIGHT
+# =========================
+
+st.subheader("🧠 Automatic Insights")
+
+top_country = titles.iloc[0]["Country"]
+top_title = titles.iloc[0]["Titles"]
+
+top_player = scorers.iloc[
+    scorers["Goals"].idxmax()
+]["Player"]
+
+top_goals = scorers["Goals"].max()
 
 st.success(
-    f"⚽ {terproduktif['Negara']} menjadi tim paling produktif dengan "
-    f"{terproduktif['Goal_Masuk']} gol."
-)
+f"""
+• Country with most titles: {top_country} ({top_title} titles)
 
-st.success(
-    f"🛡️ {pertahanan['Negara']} memiliki pertahanan terbaik dengan "
-    f"{pertahanan['Clean_Sheet']} clean sheet."
-)
+• Greatest scorer: {top_player} ({top_goals} goals)
 
-st.success(
-    f"🌎 {benua_terkuat} menjadi benua paling dominan "
-    f"berdasarkan total poin."
-)
+• Germany and Brazil dominate both championships and scoring records.
 
-st.success(
-    f"🏆 {terbaik['Negara']} merupakan kandidat juara utama "
-    f"berdasarkan Power Score."
-)
-
-st.divider()
-
-# ==================================================
-# PREDIKSI JUARA
-# ==================================================
-st.markdown("""
-# 🔮 Road To Glory
-
-Siapa kandidat terkuat untuk mengangkat trofi?
-""")
-
-st.balloons()
-
-st.success(
-    f"""
-🏆 Berdasarkan kombinasi statistik poin, produktivitas gol,
-dan kekuatan pertahanan, **{terbaik['Negara']}**
-menjadi kandidat terkuat untuk menjuarai
-FIFA World Cup 2026.
-
-Negara ini memiliki Power Score tertinggi
-dibandingkan seluruh peserta turnamen.
+• Lionel Messi and Mbappe are active legends still shaping World Cup history.
 """
 )
 
-# ==================================================
-# TOP 10 RANKING
-# ==================================================
-st.markdown("""
-# 🏅 Official Power Ranking
+# =========================
+# DATA TABLE
+# =========================
 
-10 negara terbaik berdasarkan performa keseluruhan.
+st.subheader("📋 Complete Dataset")
+
+tab1,tab2 = st.tabs(
+    ["Champions Data","Top Scorer Data"]
+)
+
+with tab1:
+    st.dataframe(champions,
+                 use_container_width=True)
+
+with tab2:
+    st.dataframe(scorers,
+                 use_container_width=True)
+
+# =========================
+# CONCLUSION
+# =========================
+
+st.subheader("📌 Final Conclusion")
+
+st.info("""
+The FIFA World Cup has produced legendary champions and players across generations.
+
+Brazil remains the most successful nation, while Miroslav Klose holds the all-time scoring record.
+
+The analysis demonstrates how football history can be explored through data visualization, helping identify trends, dominance periods, and player achievements over time.
 """)
-
-top10 = ranking.head(10)
-
-st.dataframe(
-    top10[
-        [
-            "Negara",
-            "Benua",
-            "Poin",
-            "Goal_Masuk",
-            "Clean_Sheet",
-            "Power_Score"
-        ]
-    ],
-    use_container_width=True
-)
-
-# ==================================================
-# HEATMAP VISUAL
-# ==================================================
-st.markdown("""
-# 📊 Tournament Performance Matrix
-
-Visualisasi performa negara berdasarkan poin dan gol.
-""")
-
-fig_heat = px.density_heatmap(
-    df,
-    x="Goal_Masuk",
-    y="Poin",
-    title="Performance Density Map"
-)
-
-st.plotly_chart(
-    fig_heat,
-    use_container_width=True
-)
-
-# ==================================================
-# FINAL WHISTLE
-# ==================================================
-st.markdown("---")
-
-st.markdown("""
-# 📖 Final Whistle
-
-Statistik tidak selalu dapat memprediksi masa depan,
-tetapi mampu menunjukkan siapa yang tampil paling dominan.
-
-Melalui analisis performa, produktivitas gol,
-kekuatan pertahanan, hingga dominasi antar benua,
-dashboard ini memberikan gambaran menyeluruh mengenai
-persaingan menuju trofi FIFA World Cup 2026.
-
-Pada akhirnya hanya satu negara yang akan menjadi juara.
-
-Namun data telah memberikan petunjuk mengenai
-siapa yang paling siap menuliskan sejarah.
-
----
-
-## ⚽ Data Never Lies. Champions Make History.
-
-🏆 FIFA World Cup 2026 Analytics Hub
-""")
-
-st.divider()
-
-# ==================================================
-# CONTINENTAL DOMINANCE
-# ==================================================
-st.markdown("""
-# 🌎 Continental Dominance
-
-Perbandingan kekuatan antar benua berdasarkan total poin.
-""")
-
-benua_data = (
-    df.groupby("Benua")["Poin"]
-    .sum()
-    .reset_index()
-)
-
-fig_benua = px.pie(
-    benua_data,
-    names="Benua",
-    values="Poin",
-    hole=0.5,
-    title="Point Distribution by Continent"
-)
-
-st.plotly_chart(
-    fig_benua,
-    use_container_width=True
-)
-
-st.divider()
-
-# ==================================================
-# GOAL VS POINTS
-# ==================================================
-st.markdown("""
-# 📈 Goal vs Points Analysis
-
-Hubungan antara jumlah gol dan poin yang diperoleh.
-Semakin besar lingkaran, semakin tinggi Power Score.
-""")
-
-fig_scatter = px.scatter(
-    df,
-    x="Goal_Masuk",
-    y="Poin",
-    size="Power_Score",
-    color="Benua",
-    hover_name="Negara"
-)
-
-st.plotly_chart(
-    fig_scatter,
-    use_container_width=True
-)
-
-# ==================================================
-# POWER RANKING
-# ==================================================
-st.markdown("""
-# 🌟 Power Ranking
-
-15 negara dengan Power Score tertinggi.
-""")
-
-ranking = df.sort_values(
-    "Power_Score",
-    ascending=False
-)
-
-fig_rank = px.line(
-    ranking.head(15),
-    x="Negara",
-    y="Power_Score",
-    markers=True,
-    title="Top 15 Power Ranking"
-)
-
-st.plotly_chart(
-    fig_rank,
-    use_container_width=True
-)
-
-st.divider()
