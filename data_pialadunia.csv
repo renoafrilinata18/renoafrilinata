@@ -1,60 +1,41 @@
-Negara,Benua,Grup,Pertandingan,Menang,Seri,Kalah,Goal_Masuk,Goal_Kemasukan,Clean_Sheet,Ranking_FIFA,Poin
-Argentina,Amerika Selatan,A,3,2,1,0,7,2,2,1,7
-Brazil,Amerika Selatan,A,3,2,0,1,8,3,1,5,6
-Morocco,Afrika,A,3,2,1,0,4,1,2,12,7
-Qatar,Asia,A,3,0,1,2,1,6,0,55,1
+Year,Champion,RunnerUp,Host
+1930,Uruguay,Argentina,Uruguay
+1934,Italy,Czechoslovakia,Italy
+1938,Italy,Hungary,France
+1950,Uruguay,Brazil,Brazil
+1954,Germany,Hungary,Switzerland
+1958,Brazil,Sweden,Sweden
+1962,Brazil,Czechoslovakia,Chile
+1966,England,Germany,England
+1970,Brazil,Italy,Mexico
+1974,Germany,Netherlands,Germany
+1978,Argentina,Netherlands,Argentina
+1982,Italy,Germany,Spain
+1986,Argentina,Germany,Mexico
+1990,Germany,Argentina,Italy
+1994,Brazil,Italy,USA
+1998,France,Brazil,France
+2002,Brazil,Germany,South Korea/Japan
+2006,Italy,France,Germany
+2010,Spain,Netherlands,South Africa
+2014,Germany,Argentina,Brazil
+2018,France,Croatia,Russia
+2022,Argentina,France,Qatar
 
-France,Eropa,B,3,3,0,0,9,2,2,2,9
-England,Eropa,B,3,2,1,0,6,2,2,4,7
-Canada,CONCACAF,B,3,1,1,1,4,4,0,31,4
-Iraq,Asia,B,3,1,0,2,2,5,0,59,3
+Player,Country,Goals,Matches
+Miroslav Klose,Germany,16,24
+Ronaldo,Brazil,15,19
+Gerd Muller,Germany,14,13
+Just Fontaine,France,13,6
+Lionel Messi,Argentina,13,26
+Pele,Brazil,12,14
+Kylian Mbappe,France,12,14
+Sandor Kocsis,Hungary,11,5
+Jurgen Klinsmann,Germany,11,17
+Helmut Rahn,Germany,10,10
+Gary Lineker,England,10,12
+Thomas Muller,Germany,10,19
+Gabriel Batistuta,Argentina,10,12
+Teofilo Cubillas,Peru,10,13
+Grzegorz Lato,Poland,10,20
 
-Spain,Eropa,C,3,2,0,1,7,3,1,3,6
-Portugal,Eropa,C,3,2,0,1,5,2,1,7,6
-Nigeria,Afrika,C,3,2,0,1,5,3,1,30,6
-New Zealand,Oseania,C,3,1,1,1,3,3,1,94,4
-
-Germany,Eropa,D,3,1,1,1,5,4,1,10,4
-Netherlands,Eropa,D,3,1,2,0,4,2,1,6,5
-Japan,Asia,D,3,2,0,1,5,4,1,15,6
-Costa Rica,CONCACAF,D,3,1,0,2,2,5,0,54,3
-
-Belgium,Eropa,E,3,1,1,1,4,4,0,8,4
-Croatia,Eropa,E,3,1,1,1,3,3,1,12,4
-Senegal,Afrika,E,3,1,1,1,3,3,1,20,4
-Chile,Amerika Selatan,E,3,1,0,2,2,5,0,42,3
-
-South Korea,Asia,F,3,1,1,1,3,4,1,23,4
-Iran,Asia,F,3,1,1,1,4,3,1,18,4
-United States,CONCACAF,F,3,2,0,1,6,3,1,16,6
-Uruguay,Amerika Selatan,F,3,1,0,2,2,4,0,11,3
-
-Saudi Arabia,Asia,G,3,1,1,1,3,4,0,58,4
-Australia,Asia,G,3,1,0,2,2,4,0,24,3
-Colombia,Amerika Selatan,G,3,2,0,1,5,3,1,9,6
-Egypt,Afrika,G,3,1,1,1,4,4,0,33,4
-
-Mexico,CONCACAF,H,3,1,1,1,3,3,1,17,4
-Panama,CONCACAF,H,3,1,0,2,3,6,0,45,3
-Ecuador,Amerika Selatan,H,3,1,1,1,3,3,1,27,4
-Tunisia,Afrika,H,3,0,1,2,1,5,0,41,1
-
-Paraguay,Amerika Selatan,I,3,1,1,1,3,4,0,44,4
-Serbia,Eropa,I,3,1,1,1,4,4,0,29,4
-Switzerland,Eropa,I,3,1,1,1,3,3,1,19,4
-Ghana,Afrika,I,3,1,0,2,2,5,0,61,3
-
-Denmark,Eropa,J,3,1,1,1,4,4,0,21,4
-Austria,Eropa,J,3,1,1,1,3,3,1,25,4
-Cameroon,Afrika,J,3,1,1,1,4,4,0,49,4
-Uzbekistan,Asia,J,3,1,1,1,3,3,1,57,4
-
-Norway,Eropa,K,3,2,0,1,5,3,1,26,6
-Poland,Eropa,K,3,1,0,2,3,5,0,28,3
-Ivory Coast,Afrika,K,3,1,1,1,3,3,1,37,4
-Jordan,Asia,K,3,1,0,2,2,5,0,68,3
-
-Czechia,Eropa,L,3,1,1,1,3,3,1,36,4
-Scotland,Eropa,L,3,1,0,2,2,4,0,39,3
-Turkey,Eropa,L,3,1,1,1,4,4,0,35,4
-Ukraine,Eropa,L,3,1,0,2,2,5,0,24,3
